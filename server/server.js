@@ -5,11 +5,11 @@ import fetch from "node-fetch";
 import engines from 'consolidate';
 
 const {
-    DOMAINS,
+    DOMAINS = 'mj-fastlane-test.onrender.com',
     PAYPAL_API_BASE_URL = 'https://api-m.sandbox.paypal.com', // use https://api-m.paypal.com for production environment
     PAYPAL_SDK_BASE_URL = 'https://www.sandbox.paypal.com', // use https://www.paypal.com for production environment
-    PAYPAL_CLIENT_ID,
-    PAYPAL_CLIENT_SECRET,
+    PAYPAL_CLIENT_ID = 'AaUGgdWVl2uMf-6q7HgvX9QD5OVYZ0HVaYUZO6gNwtUtnjpts-cZhkSiSiZEY4oEUfUYS3v4VPVNhQtA',
+    PAYPAL_CLIENT_SECRET = 'ENTqPHpxQZ-Ryjs67f6vHN6rCKS77TIGRP2gd8WXwpsULv-CJjEdM9o-_5pZ-wslWnNJ4gV0-AHFWEfJ',
   } = process.env;
 
 const app = express();
