@@ -8,8 +8,11 @@ const {
     DOMAINS = 'mj-fastlane-test.onrender.com',
     PAYPAL_API_BASE_URL = 'https://api-m.sandbox.paypal.com', // use https://api-m.paypal.com for production environment
     PAYPAL_SDK_BASE_URL = 'https://www.sandbox.paypal.com', // use https://www.paypal.com for production environment
-    PAYPAL_CLIENT_ID = 'AfdS3mz-PHqfz37oieDgxus_imOMo3Yj3Lj1s9jnIwSeb0fZDANp76PXAmxz7I8uJlftt_WrAYgkVHyW',
-    PAYPAL_CLIENT_SECRET = 'EPlBbc-6EE5h8SPadKM49g5fdc0SFXCVUHs9d_YBZol2Mexf6d1DPPWtGdJ761wt95HWlBaSxnhuEW-S',
+    // PAYPAL_CLIENT_ID = 'AfdS3mz-PHqfz37oieDgxus_imOMo3Yj3Lj1s9jnIwSeb0fZDANp76PXAmxz7I8uJlftt_WrAYgkVHyW',
+    // PAYPAL_CLIENT_SECRET = 'EPlBbc-6EE5h8SPadKM49g5fdc0SFXCVUHs9d_YBZol2Mexf6d1DPPWtGdJ761wt95HWlBaSxnhuEW-S',
+    PAYPAL_CLIENT_ID = 'AaUGgdWVl2uMf-6q7HgvX9QD5OVYZ0HVaYUZO6gNwtUtnjpts-cZhkSiSiZEY4oEUfUYS3v4VPVNhQtA',
+    PAYPAL_CLIENT_SECRET = 'ENTqPHpxQZ-Ryjs67f6vHN6rCKS77TIGRP2gd8WXwpsULv-CJjEdM9o-_5pZ-wslWnNJ4gV0-AHFWEfJ',
+    PAYPAL_SELLER_PAYER_ID = 'HKQAR44CHC4LQ',
   } = process.env;
 
 const app = express();
@@ -41,6 +44,29 @@ function getPayPalSdkUrl() {
     return sdkUrl.toString();
 }
 
+const jwt = getAuthAssertionValue(PAYPAL_CLIENT_ID, PAYPAL_SELLER_PAYER_ID);
+console.log("PayPal-Auth-Assertion = ", jwt)
+
+function getAuthAssertionValue(clientId, sellerPayerId) {
+    const header = {
+        "alg": "none"
+    };
+    const encodedHeader = base64url(header);
+    const payload = {
+        "iss": clientId,
+        "payer_id": sellerPayerId
+    };
+    const encodedPayload = base64url(payload);
+    return `${encodedHeader}.${encodedPayload}.`;
+}
+
+function base64url(json) {
+    return btoa(JSON.stringify(json))
+        .replace(/=+$/, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+}
+
 async function getClientToken() {
     try {
       if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
@@ -53,8 +79,10 @@ async function getClientToken() {
       const auth = Buffer.from(
         `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`
       ).toString('base64');
+
       headers.append('Authorization', `Basic ${auth}`);
       headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      headers.append('PayPal-Auth-Assertion', jwt);
   
       const searchParams = new URLSearchParams();
       searchParams.append('grant_type', 'client_credentials');
@@ -140,6 +168,7 @@ export async function createOrder(req, res) {
       headers.append('PayPal-Request-Id', Date.now().toString());
       headers.append('Authorization', `Bearer ${accessToken}`);
       headers.append('Content-Type', 'application/json');
+      headers.append('PayPal-Auth-Assertion', jwt);
     
       const { fullName } = shippingAddress?.name ?? {};
       const { countryCode, nationalNumber } = shippingAddress?.phoneNumber ?? {};
