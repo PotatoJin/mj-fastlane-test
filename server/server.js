@@ -8,8 +8,8 @@ const {
     DOMAINS = 'mj-fastlane-test.onrender.com',
     PAYPAL_API_BASE_URL = 'https://api-m.sandbox.paypal.com', // use https://api-m.paypal.com for production environment
     PAYPAL_SDK_BASE_URL = 'https://www.sandbox.paypal.com', // use https://www.paypal.com for production environment
-    PAYPAL_CLIENT_ID = 'AaUGgdWVl2uMf-6q7HgvX9QD5OVYZ0HVaYUZO6gNwtUtnjpts-cZhkSiSiZEY4oEUfUYS3v4VPVNhQtA',
-    PAYPAL_CLIENT_SECRET = 'ENTqPHpxQZ-Ryjs67f6vHN6rCKS77TIGRP2gd8WXwpsULv-CJjEdM9o-_5pZ-wslWnNJ4gV0-AHFWEfJ',
+    PAYPAL_CLIENT_ID = 'AfdS3mz-PHqfz37oieDgxus_imOMo3Yj3Lj1s9jnIwSeb0fZDANp76PXAmxz7I8uJlftt_WrAYgkVHyW',
+    PAYPAL_CLIENT_SECRET = 'EPlBbc-6EE5h8SPadKM49g5fdc0SFXCVUHs9d_YBZol2Mexf6d1DPPWtGdJ761wt95HWlBaSxnhuEW-S',
   } = process.env;
 
 const app = express();
@@ -81,6 +81,8 @@ async function getClientToken() {
 async function renderCheckout(req, res) {
     const sdkUrl = getPayPalSdkUrl();
     const clientToken = await getClientToken();
+    console.log("sdkUrl = ", sdkUrl);
+    console.log("clientToken = ", clientToken);
     const locals = {
       title:
         'Fastlane - PayPal Integration',
